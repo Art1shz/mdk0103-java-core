@@ -40,6 +40,7 @@ public class FinancialCalculator
                 expensesPerMonthInAnotherCurrencies();
                 break;
             case 0:
+                System.out.println("\nСпасибо, что воспользовались данной программой. До свидания!");
                 System.exit(1);
             default:
                 System.out.println("\nВы выбрали несуществующий пункт, выберите еще раз от 0 до 4");
