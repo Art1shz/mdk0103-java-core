@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class main {
     public static void main(String[] args) {
-        userManager userManager = new userManager();
+        userSettings userSettings = new userSettings();
         Scanner scanner = new Scanner(System.in);
 
         while (true)
@@ -23,7 +23,7 @@ public class main {
 
             try
             {
-                userManager.registerUser(login, password, repeatPassword);
+                userSettings.registerUser(login, password, repeatPassword);
                 System.out.println("Пользователь успешно зарегистрирован");
             }
             catch (loginException | passwordException e)
@@ -40,6 +40,6 @@ public class main {
         }
 
         System.out.println("Список зарегистрированных пользователей:");
-        userManager.printUsers();
+        userSettings.printUsers();
     }
 }

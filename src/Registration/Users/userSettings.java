@@ -5,7 +5,7 @@ import Registration.Users.Exceptions.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class userManager
+public class userSettings
 {
     private List<user> users = new ArrayList<>();
 
