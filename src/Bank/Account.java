@@ -1,6 +1,7 @@
 package Bank;
 
 import java.math.BigInteger;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Scanner;
 
@@ -9,7 +10,7 @@ public class Account {
     private BigInteger accID;
     private double balance;
     private String status;
-    private int paymentCount;
+    private static int paymentCount;
     private int code;
     LocalDate lastMonthlyFeeDate;
 
@@ -77,24 +78,37 @@ public class Account {
         this.paymentCount++;
     }
 
-    public boolean isFirstPaymentForServices() {
+    public static boolean isFirstPaymentForServices() {
         return paymentCount == 0;
     }
 
-    public void applyMonthlyFee() {
+    public boolean applyMonthlyFee() throws SQLException, ClassNotFoundException
+    {
+        Database db = new Database();
+
         if (status.equals("Базовый")) {
             LocalDate currentDate = LocalDate.now();
             if (lastMonthlyFeeDate.plusMonths(1).isBefore(currentDate) || lastMonthlyFeeDate.plusMonths(1).isEqual(currentDate)) {
+
+                db.updateAccountBalanceDB(this.accID.toString(),this.getBalance() - 100); // вычет платы за ежемесячное обслуживание дб
+                db.updateLastMonthlyFeeDataDB(this.accID.toString());
+
                 balance -= 100;
+
                 lastMonthlyFeeDate = currentDate;
                 System.out.println("Ежемесячная плата в размере 100 рублей списана. Текущий баланс: " + balance + " руб.");
+                return true;
             }
         }
+        return false;
     }
 
 
 
-    public void paymentForServices() {
+    public void paymentForServices() throws SQLException, ClassNotFoundException
+    {
+        Database db = new Database();
+
         Scanner scan = new Scanner(System.in);
         System.out.println("Введите сумму: ");
         double value = scan.nextDouble();
@@ -108,6 +122,9 @@ public class Account {
 
         if (isFirstPaymentForServices()) {
             System.out.println("Так как это ваша первая оплата услуг, то вам начислен приветственный бонус в виде 1000 рублей!");
+
+            db.updateAccountBalanceDB(this.accID.toString(),this.getBalance() + value); // добавление приветсвенного бонуса на счет дб
+
             addToBalance(1000);
         }
 
@@ -117,7 +134,10 @@ public class Account {
     }
 
 
-    public void transferToAccount() {
+    public void transferToAccount() throws SQLException, ClassNotFoundException
+    {
+        Database db = new Database();
+
         Scanner scan = new Scanner(System.in);
 
         System.out.println("Введите номер счёта получателя: ");
@@ -144,8 +164,11 @@ public class Account {
         String confirmation = scan.next();
 
         if (confirmation.equals("да")) {
+            db.addTransactionDB(this.accID.toString(), recipient.getAccID().toString(), value); // создание транзакции дб
+
             this.setBalance(this.getBalance() - value);
             recipient.setBalance(recipient.getBalance() + value);
+
             System.out.println("Перевод успешно выполнен");
         } else {
             System.out.println("Перевод отменён.");
